@@ -17,7 +17,7 @@ The workspace is organized to promote the Odoo development skills, agents, comma
 ├── agents/                       # Specialized subagent system profiles (e.g. planner, reviewer)
 ├── commands/                     # Slash commands for custom agent tasks
 ├── scripts/                      # Executable helper scripts (e.g. run_tests.py)
-├── qms_sop_management/           # The target Odoo module under active development
+├── qms_sop_management/           # [Ignored] The target Odoo module under active development
 ├── docs/                         # Documentation, guides, and archives (e.g. token-killer guide)
 │   └── token-killer/             # Standalone OTK guide (kept separate from active dev)
 ├── data/                         # [Ignored] Private files and requirements specification
