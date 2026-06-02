@@ -82,6 +82,7 @@ ERRORS.md
 plugins/
 data/
 git_repo/
+qms_sop_management/
 *.db
 *.sqlite
 *.sqlite3
