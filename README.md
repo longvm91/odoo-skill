@@ -59,6 +59,50 @@ OpenClaw loads system instructions using `openclaw-agent.json`:
 ### 7. Hermes
 Hermes uses the configuration file `hermes-agent.json` to load the specialist profile, mapping all Odoo code guides as context sources.
 
+### 8. Cline & Roo Code
+Modern VS Code extensions like Cline and Roo Code automatically load rule guidelines from the root level:
+* We have created `.clinerules` which mirrors the `.cursorrules` to instruct Cline/Roo Code to read `/skills/` and enforce the same TDD, plan, and review loop workflow.
+
+### 9. Continue.dev (VS Code / JetBrains / Emacs)
+Continue is a popular open-source Copilot alternative.
+* **Codebase Indexing**: Continue automatically indexes files under `/skills/` for `@codebase` semantic search.
+* **Custom Slash Commands**: Add custom commands to your `~/.continue/config.json` that reference our local markdown templates:
+  ```json
+  {
+    "slashCommands": [
+      {
+        "name": "odoo-plan",
+        "description": "Plan Odoo feature using local guidelines",
+        "prompt": "Read the odoo-planner agent details under agents/odoo-planner.md and create a plan for: {{{ input }}}"
+      }
+    ]
+  }
+  ```
+
+### 10. Aider (CLI Agent)
+Aider is a terminal-based AI pair programmer.
+* **Automatic Load**: Start Aider and instruct it to read the skills repository:
+  ```bash
+  aider --read skills/
+  ```
+  Alternatively, you can add `read: [skills/]` to your `.aider.conf.yml` at the root of the project to automatically load the patterns.
+
+### 11. Custom Web UIs (Open WebUI / LibreChat)
+For web-based chat interfaces connected to local LLMs (e.g. Ollama, OpenRouter, self-hosted API):
+* **Open WebUI (Knowledge Bases)**: Under the **Workspace** tab, create a new Knowledge Base named `Odoo Developer Skill` and upload the markdown files from the `/skills/` directory. Attach this Knowledge Base to your custom Odoo Agent.
+* **LibreChat (Custom Agents)**: Create an agent, set the system instructions to the contents of `SKILL.md` at root, and upload files in `skills/` to the Agent's file attachment storage for RAG retrieval.
+
+### 12. Local Developer Frameworks (CrewAI / AutoGen / LangChain)
+If building custom autonomous Python agents:
+* **Tool-based Loading**: Instantiate a `DirectoryReadTool` (from CrewAI Tools) or `DirectoryLoader` (from LangChain) pointing to the `./skills/` directory:
+  ```python
+  from crewai_tools import DirectoryReadTool
+  
+  # Give the Odoo developer agent read access to our curated patterns
+  odoo_skills_tool = DirectoryReadTool(directory='./skills')
+  ```
+
+
 ---
 
 ## 💾 Test Verification
