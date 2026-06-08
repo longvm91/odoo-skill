@@ -1,164 +1,267 @@
 ---
 name: odoo-development
 description: |
-  MUST be loaded when ANY Odoo development task is detected.
-  CRITICAL: Claude MUST use this skill for ALL tasks involving:
-  - "odoo", "module", "model", "view", "field", "OWL", "manifest"
-  - ANY mention of Odoo versions (14, 15, 16, 17, 18, 19)
-  - "create odoo module", "generate odoo code", "review odoo module"
-  - "upgrade odoo", "odoo best practices", "odoo security"
+  MUST be loaded when user requests Odoo module development.
+  Triggers: "odoo", "create module", "build module", "Odoo 18",
+  "new model", "custom module", requirement document, spec sheet.
+  Focus: Odoo 18+ (Enterprise & Community).
 
-  ALWAYS trigger the odoo-context-gatherer agent BEFORE writing ANY Odoo code.
+  ALWAYS follow the workflow in this file step by step.
+  DO NOT skip requirement analysis phase.
 ---
 
-# Odoo Development Skill Index
-
-> **CRITICAL**: Before writing ANY Odoo code, Claude MUST invoke the
-> `odoo-context-gatherer` agent to compile relevant patterns for the task.
->
-> **MANDATORY WORKFLOW**:
-> 1. Detect/confirm Odoo version (NEVER skip)
-> 2. Invoke `odoo-development:odoo-context-gatherer` agent with task description
-> 3. Use returned context patterns for code generation
-> 4. NEVER skip step 2 - context gathering is REQUIRED
+# Odoo Development Skill (Odoo 18+)
 
 ```
-╔══════════════════════════════════════════════════════════════════════════════╗
-║  BEFORE generating Odoo code, you MUST:                                      ║
-║  1. Determine the target Odoo version                                        ║
-║  2. Invoke odoo-context-gatherer agent with task description                 ║
-║  3. Use the patterns returned by the agent                                   ║
-║                                                                              ║
-║  DO NOT generate Odoo code without context from the agent.                   ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════╗
+║  ODOO 18+ DEVELOPMENT SKILL                                          ║
+║  End-to-end: requirement → plan → code → verify                      ║
+║  Target: Odoo 18.0 / 19.0 (Enterprise & Community)                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
 ```
 
-> **Usage**: This is a lightweight discovery index. DO NOT read full skill files unless needed.
-> Use `Read` tool on specific file paths only when you need the detailed pattern.
+## Tool Mapping
 
-## Quick Reference (Copy-Paste Ready)
+Skill files reference generic tool names. Map to your platform:
 
-### Field Declarations
-```python
-# Basic fields
-name = fields.Char(required=True)
-active = fields.Boolean(default=True)
-sequence = fields.Integer(default=10)
-amount = fields.Float(digits=(16, 2))
-date = fields.Date(default=fields.Date.today)
-note = fields.Text()
-html_content = fields.Html()
-
-# Relational
-partner_id = fields.Many2one('res.partner', ondelete='cascade')
-tag_ids = fields.Many2many('my.tag', string='Tags')
-line_ids = fields.One2many('my.line', 'parent_id')
-
-# Computed
-total = fields.Float(compute='_compute_total', store=True)
-@api.depends('line_ids.amount')
-def _compute_total(self):
-    for rec in self:
-        rec.total = sum(rec.line_ids.mapped('amount'))
-```
-
-### Model Declaration
-```python
-class MyModel(models.Model):
-    _name = 'my.model'
-    _description = 'My Model'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
-    _order = 'sequence, id'
-```
-
-### View Visibility (v17+ vs v14-16)
-```xml
-<!-- v17+: direct attribute -->
-<field name="x" invisible="state != 'draft'"/>
-<field name="y" readonly="is_locked"/>
-
-<!-- v14-16: attrs dict -->
-<field name="x" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-```
+| Generic Name | Hermes | Cursor | Claude Code |
+|-------------|--------|--------|-------------|
+| read_file | `read_file` | `@file` | `read_file()` |
+| search_files | `search_files` | `@codebase` | `grep`/`bash` |
+| write_file | `write_file` | Write tool | `bash` cat/tee |
+| patch_file | `patch` | Edit tool | `bash` sed |
+| browse_url | `browser_navigate` + `browser_snapshot` | Manual | `curl` |
+| run_command | `terminal` | Terminal | `Terminal` |
+| list_files | `search_files(target='files')` | `@codebase` | `ls`/`glob` |
 
 ---
 
-## Skill Discovery Index
+## REQUIRED WORKFLOW (Follow Every Time)
 
-| Intent / Keywords | Skill File | Description |
-|-------------------|------------|-------------|
-| fields, char, many2one, one2many, selection | `skills/field-type-reference.md` | All field types with attributes |
-| computed, depends, inverse, search | `skills/computed-field-patterns.md` | Computed field patterns |
-| constraint, validation, check | `skills/constraint-patterns.md` | SQL and Python constraints |
-| onchange, dynamic, domain | `skills/onchange-dynamic-patterns.md` | Form field dynamics |
-| view, form, tree, kanban, search | `skills/xml-view-patterns.md` | XML view patterns |
-| widget, statusbar, badge, image | `skills/widget-field-patterns.md` | Field widgets |
-| qweb, template, t-if, t-foreach | `skills/qweb-template-patterns.md` | QWeb templating |
-| action, window, server, client | `skills/action-patterns.md` | Action patterns |
-| menu, navigation, menuitem | `skills/menu-navigation-patterns.md` | Menu structure |
-| security, access, rule, group | `skills/odoo-security-guide.md` | Security configuration |
-| workflow, state, statusbar, approval | `skills/workflow-state-patterns.md` | State machines |
-| wizard, transient, dialog | `skills/wizard-patterns.md` | Wizard patterns |
-| report, pdf, qweb, print | `skills/report-patterns.md` | PDF reports |
-| cron, scheduled, automation | `skills/cron-automation-patterns.md` | Scheduled actions |
-| controller, http, api, rest, json | `skills/controller-api-patterns.md` | HTTP controllers |
-| mail, email, chatter, activity | `skills/mail-notification-patterns.md` | Mail integration |
-| multi-company, company, currency | `skills/multi-company-patterns.md` | Multi-company |
-| inherit, extend, override | `skills/inheritance-patterns.md` | Model/view inheritance |
-| migration, upgrade, version | `skills/data-migration-patterns.md` | Data migration |
-| website, portal, public | `skills/website-integration-patterns.md` | Website integration |
-| external, api, webhook, sync | `skills/external-api-patterns.md` | External APIs |
-| logging, debug, error | `skills/logging-debugging-patterns.md` | Logging/debugging |
-| stock, inventory, warehouse, move | `skills/stock-inventory-patterns.md` | Stock operations |
-| account, invoice, journal, payment | `skills/accounting-patterns.md` | Accounting |
-| sale, order, quotation, crm, lead | `skills/sale-crm-patterns.md` | Sales/CRM |
-| hr, employee, contract, leave | `skills/hr-employee-patterns.md` | HR patterns |
-| domain, filter, search, operator | `skills/domain-filter-patterns.md` | Search domains |
-| sequence, number, reference | `skills/sequence-numbering-patterns.md` | Auto-numbering |
-| purchase, vendor, procurement | `skills/purchase-procurement-patterns.md` | Purchasing |
-| project, task, timesheet | `skills/project-task-patterns.md` | Project management |
-| context, env, sudo, with_context | `skills/context-environment-patterns.md` | Environment/context |
-| exception, error, validation | `skills/error-handling-patterns.md` | Error handling |
-| portal, token, access, share | `skills/portal-access-patterns.md` | Portal access |
-| dashboard, kpi, analytics, graph | `skills/dashboard-kpi-patterns.md` | Dashboards |
-| settings, config, parameter | `skills/config-settings-patterns.md` | Module settings |
-| translation, i18n, language | `skills/translation-i18n-patterns.md` | Translations |
-| assets, js, css, scss, bundle | `skills/assets-bundling-patterns.md` | Asset bundling |
-| variant, attribute, product | `skills/product-variant-patterns.md` | Product variants |
-| pricelist, price, discount | `skills/pricelist-pricing-patterns.md` | Pricing |
-| uom, unit, measure, conversion | `skills/uom-patterns.md` | Units of measure |
-| lot, serial, batch, expiry | `skills/lot-serial-patterns.md` | Lot/serial tracking |
-| import, export, csv, excel | `skills/import-export-patterns.md` | Data import/export |
-| tax, fiscal, vat | `skills/tax-fiscal-patterns.md` | Tax configuration |
-| owl, component, frontend, javascript | `skills/odoo-owl-components.md` | OWL components |
-| test, unittest, integration | `skills/odoo-test-patterns.md` | Testing |
-| run tests, execute tests, debug tracebacks | `skills/odoo-test-execution.md` | Test execution & log analysis |
-| performance, optimize, index | `skills/odoo-performance-guide.md` | Performance |
-| manifest, module, depends | `skills/odoo-module-generator.md` | Module structure |
-| version, 14, 15, 16, 17, 18, 19 | `skills/odoo-version-knowledge.md` | Version differences |
-| binary, attachment, file, image | `skills/attachment-binary-patterns.md` | File handling |
+### PHASE 0: Load Context
+
+1. Read `SKILL.md` (this file) — entry point
+2. Read `skills/workflow-orchestrator.md` — master workflow
+3. Read `agents/odoo-planner.md` — planning subagent
+4. Read appropriate skill files based on requirement type:
+   - `skills/odoo-module-generator-18.md` — module scaffold
+   - `skills/odoo-model-patterns-18.md` — model patterns
+   - `skills/odoo-security-guide-18.md` — security
+   - Domain-specific: `skills/xml-view-patterns.md`, `skills/report-patterns.md`, etc.
 
 ---
 
-## Version-Specific Patterns
+### PHASE 1: Parse Requirements
 
-For version-specific code, check these skill files:
-- `skills/odoo-version-knowledge.md` - Breaking changes by version
-- `skills/odoo-owl-components.md` - OWL 1.x (v15) / 2.x (v16-18) / 3.x (v19)
-- Version-specific files: `skills/{pattern}-{version}.md`
+When user gives requirement document (Word, Excel, text, email, screenshot):
 
-## How to Use This Index
-
-1. **Identify keywords** from user's request
-2. **Find matching row** in the index table
-3. **Read only the specific skill file** using `Read` tool
-4. **Use patterns** from that file
-5. **Don't preload** - only load what you need
-
-Example:
+#### Step 1.1 — Read input
 ```
-User: "Create a computed field that sums order lines"
-→ Keywords: computed, depends
-→ Read: skills/computed-field-patterns.md
-→ Use the pattern, don't keep file in context
+User input → read_file (if file path given) → extract content
+           → or use content from user message directly
 ```
+
+#### Step 1.2 — Extract entities
+Scan content and identify:
+
+```
+MODELS:
+  - [model_name] — description, inherits from?
+  - Fields: [field_name, type, required?, relation?]
+  - Computed fields, constraints
+
+WORKFLOWS:
+  - States (draft → confirmed → done → cancelled)
+  - State transitions + validation rules
+  - Actions per state (buttons, allowed operations)
+
+SECURITY:
+  - User roles needed (user, manager, admin)
+  - Record-level rules (multi-company, user-owned)
+  - Field-level visibility
+
+EXISTING MODULES TO EXTEND:
+  - sale, stock, account, hr, project, purchase, ...
+  - Specific models: sale.order, stock.move, account.move, ...
+
+REPORTS:
+  - PDF reports needed
+  - Excel exports
+  - Dashboard/KPI
+
+INTEGRATIONS:
+  - Email notifications
+  - Portal access
+  - REST API endpoints
+  - Webhooks
+```
+
+#### Step 1.3 — Output requirement spec
+Create `REQUIREMENT_SPEC.md` in the output module directory:
+
+```markdown
+# Requirement Specification
+
+## Module
+- **Name**: {technical_name}
+- **Description**: {purpose}
+
+## Models
+| Model | Inherits | Description |
+|-------|----------|-------------|
+| model.name | res.partner | Business object |
+
+## Fields per Model
+### model.name
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| name | Char | Yes | Display name |
+| partner_id | Many2one(res.partner) | Yes | Link to partner |
+| state | Selection | No | Workflow state |
+| total | Float(compute) | No | Sum of lines |
+
+## Workflows
+- model.name: draft → confirm → approve → done
+
+## Security
+- group_user: read/create/write own
+- group_manager: full access
+
+## Reports / Views
+- List view of model.name
+- Form view with chatter
+- PDF report
+```
+
+#### Step 1.4 — Confirm with user
+"Đã parse requirements. Output spec at REQUIREMENT_SPEC.md. OK to proceed?"
+
+---
+
+### PHASE 2: Create PLAN.md
+
+Load `agents/odoo-planner.md` instructions, then create `PLAN.md`:
+
+```
+Structure:
+├── Module description
+├── Technical approach (inherit vs new models)
+├── Component map (views, security, reports, cron, etc.)
+├── Task list (ordered by dependency)
+│   T01: Scaffold
+│   T02: Security groups + access
+│   T03: Model definitions
+│   T04-X: Views, menus, reports, etc.
+├── Progress table
+└── Risks & notes
+```
+
+---
+
+### PHASE 3: Execute Tasks
+
+For each task:
+
+1. Read relevant skill file before coding
+2. Generate code following Odoo 18+ patterns
+3. Update PLAN.md progress
+4. Report to user
+
+**Odoo 18+ patterns reminder:**
+- `@api.model_create_multi` for create()
+- `invisible="expr"` NOT `attrs`
+- `_check_company_auto = True` for company-scoped models
+- `check_company=True` on relational fields
+- `Command.create(...)` NOT `(0, 0, ...)`
+- `allowed_company_ids` in record rules
+- Type hints on fields (recommended)
+- `SQL()` builder for raw SQL
+
+---
+
+### PHASE 4: Verify
+
+- [ ] Python syntax check (run `python3 -m py_compile` on each .py)
+- [ ] XML well-formed check
+- [ ] Security: every model has ir.model.access.csv entry
+- [ ] Manifest data order: security → data → views → menus
+- [ ] No version-deprecated patterns (attrs, @api.multi, tuple commands)
+- [ ] Tests generated (if requested)
+
+---
+
+## Skill Index (Odoo 18+)
+
+Load these files as needed based on task:
+
+| Task | File to Load |
+|------|-------------|
+| Module scaffold, manifest | `skills/odoo-module-generator-18.md` |
+| Model fields, relations, computed | `skills/odoo-model-patterns-18.md` |
+| Security groups, access, rules | `skills/odoo-security-guide-18.md` |
+| XML views (form, list, search) | `skills/xml-view-patterns.md` |
+| State machine / workflow | `skills/workflow-state-patterns.md` |
+| Wizard / popup dialog | `skills/wizard-patterns.md` |
+| PDF report | `skills/report-patterns.md` |
+| Email / chatter / activity | `skills/mail-notification-patterns.md` |
+| Cron / scheduled action | `skills/cron-automation-patterns.md` |
+| Multi-company setup | `skills/multi-company-patterns.md` |
+| Portal / external access | `skills/portal-access-patterns.md` |
+| HTTP controller / API | `skills/controller-api-patterns.md` |
+| OWL / JavaScript / frontend | `skills/odoo-owl-components-18.md` |
+| Tests | `skills/odoo-test-patterns.md` |
+| Performance | `skills/odoo-performance-guide.md` |
+| Troubleshooting | `skills/odoo-troubleshooting-guide.md` |
+| Onchange, dynamic domain | `skills/onchange-dynamic-patterns.md` |
+| Inheritance | `skills/inheritance-patterns.md` |
+| Constraints | `skills/constraint-patterns.md` |
+| Field type reference | `skills/field-type-reference.md` |
+| Error handling | `skills/error-handling-patterns.md` |
+| Logging/debugging | `skills/logging-debugging-patterns.md` |
+| Data migration | `skills/data-migration-patterns.md` |
+
+---
+
+## File Output Structure (Standard Odoo Module)
+
+```
+{module_name}/
+├── __manifest__.py
+├── __init__.py
+├── models/
+│   ├── __init__.py
+│   └── {model_name}.py
+├── security/
+│   ├── {module_name}_security.xml
+│   └── ir.model.access.csv
+├── views/
+│   ├── {model_name}_views.xml
+│   ├── {model_name}_reports.xml (if needed)
+│   └── menu_items.xml
+├── data/
+│   └── (sequence, demo, config data)
+├── reports/ (if PDF needed)
+│   ├── __init__.py
+│   └── ...report templates
+├── controllers/ (if API needed)
+│   ├── __init__.py
+│   └── main.py
+├── static/
+│   └── src/ (JS/SCSS assets)
+├── tests/
+│   ├── __init__.py
+│   ├── common.py
+│   └── test_{model}.py
+└── PLAN.md
+```
+
+---
+
+## Absolute Rules
+
+1. **Always detect Odoo version first** — assume 18.0 if not specified
+2. **Read skill file before writing code** — never guess Odoo syntax
+3. **Requirement spec before PLAN, PLAN before code**
+4. **Update PLAN.md after every task** — never let it go stale
+5. **Security: every model needs access rights** — no exceptions
+6. **Odoo 18+ patterns only** — no deprecated attrs, @api.multi, tuple commands

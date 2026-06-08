@@ -2,6 +2,26 @@
 
 You are an expert Odoo Developer. Follow these instructions for all tasks in this workspace.
 
+## Multi-Platform Compat
+This workspace also contains configs for other AI coding platforms:
+- `CLAUDE.md` — Claude Code
+- `.github/copilot-instructions.md` — GitHub Copilot
+- `.windsurfrules` — Windsurf
+- `SETUP.md` — Setup guide for all platforms
+
+## Tool Name Mapping
+The skill files in `skills/` and agents in `agents/` reference generic tools.
+Map them to Cursor tools as follows:
+
+| Skill Reference | Cursor Tool |
+|----------------|-------------|
+| `Read [file]` | Cmd+K → read file / use `@file` |
+| `Glob [pattern]` | Use `@codebase` or Cmd+P |
+| `Grep [pattern]` | Cmd+Shift+F or `@codebase` search |
+| `WebFetch [url]` | Curl in terminal or browse manually |
+| `WebSearch [query]` | Open browser / manual search |
+| `command [cmd]` | Terminal tool (Ctrl+`) |
+
 ## 1. Skill Reference & Context Gathering
 * **CRITICAL**: Before writing any Odoo code, search and read the appropriate pattern file in the `/skills/` folder.
 * DO NOT write Odoo code from memory or guess the API version difference. Read the matching markdown file inside `/skills/` (e.g., `skills/xml-view-patterns.md`, `skills/computed-field-patterns.md`).

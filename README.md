@@ -41,8 +41,9 @@ Cursor uses the root `.cursorrules` to feed instructions into its inline and cha
 * **Usage**: Just open this folder in Cursor and talk to the AI. It will use the local knowledge base.
 
 ### 3. VS Code & GitHub Copilot
-GitHub Copilot reads custom instructions from `.vscode/copilot-instructions.md`:
-* We have created `.vscode/copilot-instructions.md` directing Copilot Chat to read Odoo patterns from the `/skills/` directory.
+GitHub Copilot reads custom instructions from `.github/copilot-instructions.md` (cross-IDE, works in VS Code, JetBrains, and others):
+- Configured to direct the model to read Odoo patterns from the `skills/` directory before writing code.
+- **Usage**: Just open this folder in VS Code and use Copilot Chat. Instructions are loaded automatically.
 
 ### 4. Codex
 Codex utilizes the `.codex-plugin/plugin.json` configuration manifest at the root:
