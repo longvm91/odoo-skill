@@ -72,6 +72,7 @@ Load the appropriate agent profile for specialized tasks:
 | Version upgrade analysis | `agents/odoo-upgrade-analyzer.md` |
 | Context gathering (pre-code) | `agents/odoo-context-gatherer.md` |
 | Finding specific patterns | `agents/odoo-skill-finder.md` |
+| PreSale / Solution Consulting (discovery, fit-gap, proposal/SOW, demo, VN compliance) | `agents/odoo-presales-consultant.md` |
 
 ---
 
